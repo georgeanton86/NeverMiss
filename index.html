@@ -1,0 +1,1474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>NeverMiss</title>
+<meta name="description" content="Never forget the people you love — shared occasions, wishlists, and reminders for your circle." />
+<meta name="theme-color" content="#E23E6B" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com/3.4.5"></script>
+
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['Fraunces', 'Georgia', 'serif'],
+          sans: ['Manrope', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        },
+        colors: {
+          ground: 'var(--ground)',
+          surface: 'var(--surface)',
+          surface2: 'var(--surface-2)',
+          ink: 'var(--ink)',
+          inksoft: 'var(--ink-soft)',
+          muted: 'var(--muted)',
+          line: 'var(--line)',
+          brand: 'var(--brand)',
+          brandstrong: 'var(--brand-strong)',
+          gold: 'var(--gold)',
+          mint: 'var(--mint)',
+          crit: 'var(--crit)',
+        },
+        boxShadow: {
+          card: '0 1px 2px rgba(43,27,51,.04), 0 8px 24px -12px rgba(43,27,51,.18)',
+          float: '0 24px 60px -20px rgba(43,27,51,.35)',
+        },
+      },
+    },
+  };
+</script>
+
+<style>
+  :root {
+    --ground: #FBF6F4;
+    --surface: #FFFFFF;
+    --surface-2: #FDEFEC;
+    --ink: #2B1B33;
+    --ink-soft: #6B5B72;
+    --muted: #9A8AA0;
+    --line: #EFE1E3;
+    --brand: #E23E6B;
+    --brand-strong: #C42E58;
+    --gold: #E39316;
+    --mint: #1FA98C;
+    --crit: #E2453E;
+    color-scheme: light;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --ground: #140E19;
+      --surface: #1E1622;
+      --surface-2: #271D2F;
+      --ink: #F6EEF3;
+      --ink-soft: #C6B3CC;
+      --muted: #8E7C97;
+      --line: #33283C;
+      --brand: #FF5C86;
+      --brand-strong: #FF7A9C;
+      --gold: #F4B24C;
+      --mint: #45CBAD;
+      --crit: #FF6B63;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #140E19;
+    --surface: #1E1622;
+    --surface-2: #271D2F;
+    --ink: #F6EEF3;
+    --ink-soft: #C6B3CC;
+    --muted: #8E7C97;
+    --line: #33283C;
+    --brand: #FF5C86;
+    --brand-strong: #FF7A9C;
+    --gold: #F4B24C;
+    --mint: #45CBAD;
+    --crit: #FF6B63;
+    color-scheme: dark;
+  }
+
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* Desktop backdrop behind the phone frame */
+  @media (min-width: 560px) {
+    body {
+      background:
+        radial-gradient(1200px 600px at 15% -10%, color-mix(in srgb, var(--brand) 16%, transparent), transparent 60%),
+        radial-gradient(900px 500px at 110% 20%, color-mix(in srgb, var(--gold) 14%, transparent), transparent 55%),
+        var(--ground);
+    }
+  }
+  * { -webkit-tap-highlight-color: transparent; }
+  ::selection { background: color-mix(in srgb, var(--brand) 28%, transparent); }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .tnum { font-variant-numeric: tabular-nums; }
+  :focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 10px; }
+
+  @keyframes sheetIn { from { transform: translateY(14px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+  @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes pop { 0%{transform:scale(.9);opacity:0} 60%{transform:scale(1.03)} 100%{transform:scale(1);opacity:1} }
+  @keyframes riseIn { from { transform: translateY(8px); opacity:0 } to { transform: translateY(0); opacity:1 } }
+  .anim-sheet { animation: sheetIn .28s cubic-bezier(.2,.8,.2,1) both; }
+  .anim-fade { animation: fadeIn .2s ease both; }
+  .anim-pop { animation: pop .3s cubic-bezier(.2,.8,.2,1) both; }
+  .anim-rise { animation: riseIn .35s cubic-bezier(.2,.8,.2,1) both; }
+  @media (prefers-reduced-motion: reduce) {
+    .anim-sheet, .anim-fade, .anim-pop, .anim-rise { animation: none !important; }
+  }
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 90; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<canvas id="confetti"></canvas>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useReducer, useRef, useCallback } = React;
+
+/* ----------------------------------------------------------------------------
+   NeverMiss — a shared-profile occasion + wishlist reminder app.
+   Single-file prototype. Data persists to localStorage (per browser).
+---------------------------------------------------------------------------- */
+
+const CIRCLES = ["Family", "Friends", "Work"];
+const OCCASION_TYPES = {
+  birthday:    { label: "Birthday",    emoji: "🎂", tone: "brand" },
+  anniversary: { label: "Anniversary", emoji: "💞", tone: "brand" },
+  holiday:     { label: "Holiday",     emoji: "🎄", tone: "gold"  },
+  wedding:     { label: "Wedding",     emoji: "💍", tone: "gold"  },
+  graduation:  { label: "Graduation",  emoji: "🎓", tone: "mint"  },
+  custom:      { label: "Occasion",    emoji: "🎉", tone: "mint"  },
+};
+const AVATAR_EMOJIS = ["🦊","🐨","🐼","🦉","🐧","🐝","🦋","🐢","🌻","🌈","🍀","⭐️","🍑","🥑","🐙","🦄","🐳","🌸","🔥","🎈"];
+const AVATAR_COLORS = ["#E23E6B","#E39316","#1FA98C","#7B5BE0","#3B82F6","#EC6C2D","#D6417B","#0EA5A0","#8B5CF6","#F0568B"];
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MONTHS_FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+const MESSAGE_TEMPLATES = {
+  birthday: [
+    "Happy birthday, {name}! 🎂 Hope this year brings you everything you've been wishing for.",
+    "{name}!! Another trip around the sun 🌞 So glad you were born. Have the best day.",
+    "Happy birthday to one of my favorite people. Cake first, responsibilities later 🍰",
+  ],
+  anniversary: [
+    "Happy anniversary, {name}! 💞 Here's to many more years of the good stuff.",
+    "{name} — celebrating you today and the love you two share. Congratulations! 🥂",
+  ],
+  holiday: [
+    "Thinking of you this season, {name} 🎄 Wishing you warmth, rest, and good food.",
+    "Happy holidays, {name}! Hope it's cozy and bright. ✨",
+  ],
+  wedding: [
+    "Congratulations, {name}! 💍 So happy for you both — here's to the adventure ahead.",
+    "{name}!! What a beautiful day. Wishing you a lifetime of love. 🥂",
+  ],
+  graduation: [
+    "Congrats, {name}! 🎓 You did it. So proud of the work you put in.",
+    "{name} — the tassel was worth the hassle! Onward to great things. 🌟",
+  ],
+  custom: [
+    "Thinking of you today, {name} 🎉 Hope it's a wonderful one!",
+    "Sending you the biggest congratulations, {name}! 💛",
+  ],
+};
+
+/* ---------- date helpers ---------- */
+const DAY = 86400000;
+function startOfToday() { const d = new Date(); d.setHours(0,0,0,0); return d; }
+function nextOccurrence(month, day, from = startOfToday()) {
+  // month: 1-12, day: 1-31
+  const y = from.getFullYear();
+  let d = new Date(y, month - 1, day, 0, 0, 0, 0);
+  if (d < from) d = new Date(y + 1, month - 1, day, 0, 0, 0, 0);
+  return d;
+}
+function daysUntil(date, from = startOfToday()) {
+  return Math.round((date.getTime() - from.getTime()) / DAY);
+}
+function ordinalYears(originalYear, onDate) {
+  if (!originalYear) return null;
+  return onDate.getFullYear() - originalYear;
+}
+function ordinal(n) {
+  const s = ["th","st","nd","rd"], v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+function relDay(n) {
+  if (n === 0) return "Today";
+  if (n === 1) return "Tomorrow";
+  return n + " days";
+}
+function fmtDate(date) { return MONTHS[date.getMonth()] + " " + date.getDate(); }
+
+/* ---------- seed data ---------- */
+const ME_ID = "me";
+function seed() {
+  return {
+    version: 3,
+    me: { id: ME_ID, name: "You", relationship: "That's me", circle: "Family", emoji: "🌈", color: "#E23E6B" },
+    theme: "system",
+    people: [
+      { id: "p_mom",   name: "Mom",     relationship: "Mother",       circle: "Family",  emoji: "🌻", color: "#E39316" },
+      { id: "p_leo",   name: "Leo",     relationship: "Best friend",  circle: "Friends", emoji: "🦊", color: "#7B5BE0" },
+      { id: "p_ava",   name: "Ava",     relationship: "Sister",       circle: "Family",  emoji: "🦋", color: "#D6417B" },
+      { id: "p_sam",   name: "Sam & Priya", relationship: "The Patels", circle: "Friends", emoji: "💞", color: "#1FA98C" },
+      { id: "p_dana",  name: "Dana",    relationship: "Manager",      circle: "Work",    emoji: "🍀", color: "#3B82F6" },
+    ],
+    occasions: [
+      { id: "o1", personId: "p_mom",  type: "birthday",    title: "Mom's Birthday",     month: nearMonth(6),  day: nearDay(6),  year: 1966 },
+      { id: "o2", personId: "p_leo",  type: "birthday",    title: "Leo's Birthday",     month: nearMonth(2),  day: nearDay(2),  year: 1994 },
+      { id: "o3", personId: "p_ava",  type: "birthday",    title: "Ava's Birthday",     month: nearMonth(20), day: nearDay(20), year: 1998 },
+      { id: "o4", personId: "p_sam",  type: "anniversary", title: "Sam & Priya's Anniversary", month: nearMonth(11), day: nearDay(11), year: 2015 },
+      { id: "o5", personId: "p_dana", type: "birthday",    title: "Dana's Birthday",    month: nearMonth(40), day: nearDay(40), year: 1980 },
+      { id: "o6", personId: ME_ID,    type: "birthday",    title: "My Birthday",        month: nearMonth(33), day: nearDay(33), year: 1996 },
+      { id: "o7", personId: "p_mom",  type: "anniversary", title: "Mom & Dad's Anniversary", month: nearMonth(70), day: nearDay(70), year: 1990 },
+    ],
+    wishes: [
+      { id: "w1", personId: "p_mom", title: "Cozy weighted blanket", price: "$60", url: "", note: "Sage green if possible 🌿", claimedBy: null },
+      { id: "w2", personId: "p_mom", title: "Pottery class for two", price: "$90", url: "", note: "", claimedBy: null },
+      { id: "w3", personId: "p_leo", title: "Vinyl: anything jazz", price: "$25–40", url: "", note: "Already has Kind of Blue!", claimedBy: null },
+      { id: "w4", personId: "p_leo", title: "Good chef's knife", price: "$120", url: "", note: "", claimedBy: ME_ID },
+      { id: "w5", personId: "p_ava", title: "Film camera", price: "$150", url: "", note: "35mm point-and-shoot", claimedBy: null },
+      { id: "w6", personId: ME_ID,   title: "Espresso cups (set of 4)", price: "$45", url: "", note: "Matte black or terracotta", claimedBy: null },
+      { id: "w7", personId: ME_ID,   title: "A good book", price: "$20", url: "", note: "Surprise me — I love sci-fi", claimedBy: null },
+    ],
+    sent: {}, // occasionId -> ISO string this year, "marked as sent"
+  };
+}
+// helpers to spread demo occasions across the coming weeks from "today"
+function nearMonth(offsetDays) { const d = new Date(startOfToday().getTime() + offsetDays * DAY); return d.getMonth() + 1; }
+function nearDay(offsetDays)   { const d = new Date(startOfToday().getTime() + offsetDays * DAY); return d.getDate(); }
+
+/* ---------- store ---------- */
+const KEY = "nevermiss.v3";
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) { const d = JSON.parse(raw); if (d && d.version === 3) return d; }
+  } catch (e) {}
+  return seed();
+}
+function save(state) { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "ADD_PERSON": {
+      const people = [...state.people, action.person];
+      const occasions = action.occasion ? [...state.occasions, action.occasion] : state.occasions;
+      return { ...state, people, occasions };
+    }
+    case "UPDATE_ME": return { ...state, me: { ...state.me, ...action.patch } };
+    case "ADD_OCCASION": return { ...state, occasions: [...state.occasions, action.occasion] };
+    case "DELETE_OCCASION": return { ...state, occasions: state.occasions.filter(o => o.id !== action.id) };
+    case "ADD_WISH": return { ...state, wishes: [...state.wishes, action.wish] };
+    case "DELETE_WISH": return { ...state, wishes: state.wishes.filter(w => w.id !== action.id) };
+    case "CLAIM": return { ...state, wishes: state.wishes.map(w => w.id === action.id ? { ...w, claimedBy: action.by } : w) };
+    case "MARK_SENT": return { ...state, sent: { ...state.sent, [action.id]: new Date().toISOString() } };
+    case "SET_THEME": return { ...state, theme: action.theme };
+    case "RESET": return seed();
+    default: return state;
+  }
+}
+
+/* ---------- confetti ---------- */
+function fireConfetti(power = 1) {
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const canvas = document.getElementById("confetti");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const colors = ["#E23E6B","#E39316","#1FA98C","#7B5BE0","#FF7A9C","#F4B24C"];
+  const cx = window.innerWidth / 2, cy = window.innerHeight * 0.34;
+  const N = Math.round(90 * power);
+  const parts = Array.from({ length: N }, () => {
+    const a = Math.random() * Math.PI * 2;
+    const sp = 4 + Math.random() * 9;
+    return {
+      x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 3,
+      g: 0.16 + Math.random() * 0.12, s: 5 + Math.random() * 6,
+      rot: Math.random() * Math.PI, vr: (Math.random() - .5) * .3,
+      c: colors[(Math.random() * colors.length) | 0], life: 0, max: 60 + Math.random() * 40,
+    };
+  });
+  let raf;
+  function tick() {
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    let alive = false;
+    for (const p of parts) {
+      if (p.life > p.max) continue;
+      alive = true;
+      p.life++; p.vy += p.g; p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+      const alpha = Math.max(0, 1 - p.life / p.max);
+      ctx.save(); ctx.globalAlpha = alpha; ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * 0.6); ctx.restore();
+    }
+    if (alive) raf = requestAnimationFrame(tick);
+    else ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  }
+  cancelAnimationFrame(raf); tick();
+}
+
+/* ---------- tiny icons ---------- */
+const Icon = ({ d, size = 22, stroke = 1.9, fill = "none", className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor"
+    strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" className={className}>
+    {Array.isArray(d) ? d.map((p, i) => <path key={i} d={p} />) : <path d={d} />}
+  </svg>
+);
+const I = {
+  home: "M3 10.5 12 3l9 7.5M5 9.5V21h5v-6h4v6h5V9.5",
+  users: ["M16 20v-1.5A3.5 3.5 0 0 0 12.5 15h-5A3.5 3.5 0 0 0 4 18.5V20","M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7","M20 20v-1.5a3.5 3.5 0 0 0-2.6-3.4","M15.5 4.2a3.5 3.5 0 0 1 0 6.6"],
+  gift: ["M20 12v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8","M3 8h18v4H3z","M12 8v13","M12 8S11 3 8.5 3 6 6 6 6s2.5 2 6 2 6-2 6-2 .5-3-2-3S12 8 12 8Z"],
+  user: ["M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2","M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"],
+  plus: "M12 5v14M5 12h14",
+  bell: ["M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9","M13.7 21a2 2 0 0 1-3.4 0"],
+  heart: "M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7A5 5 0 1 0 3.2 12.7l1.7 1.7L12 21l7.1-6.6 1.7-1.7a5 5 0 0 0 0-7.1Z",
+  share: ["M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7","M16 6l-4-4-4 4","M12 2v14"],
+  check: "M20 6 9 17l-5-5",
+  x: "M18 6 6 18M6 6l12 12",
+  chevron: "M9 6l6 6-6 6",
+  chevronL: "M15 6l-6 6 6 6",
+  spark: ["M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.4 2.4M15.3 15.3l2.4 2.4M17.7 6.3l-2.4 2.4M8.7 15.3l-2.4 2.4"],
+  cake: ["M4 21h16","M5 21v-8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8","M3 15c1.5 0 1.5 1.5 3 1.5S9 15 10.5 15 12 16.5 13.5 16.5 15 15 16.5 15 18 16.5 19.5 16.5 21 15 21 15","M12 8V5","M12 3.5a1 1 0 1 0 0 .01"],
+  copy: ["M9 9h10a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V10a1 1 0 0 1 1-1Z","M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"],
+  trash: ["M4 7h16","M10 11v6M14 11v6","M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13","M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"],
+  link: ["M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1","M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"],
+  cal: ["M7 3v3M17 3v3","M4 8h16","M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"],
+};
+
+/* ---------- primitives ---------- */
+function Avatar({ person, size = 44 }) {
+  const s = { width: size, height: size, background: `color-mix(in srgb, ${person.color} 20%, var(--surface))`,
+    borderColor: `color-mix(in srgb, ${person.color} 45%, transparent)` };
+  return (
+    <div className="rounded-full grid place-items-center border shrink-0 select-none"
+      style={s} aria-hidden="true">
+      <span style={{ fontSize: size * 0.5, lineHeight: 1 }}>{person.emoji}</span>
+    </div>
+  );
+}
+
+function Button({ children, onClick, variant = "primary", size = "md", className = "", ...rest }) {
+  const base = "inline-flex items-center justify-center gap-1.5 font-semibold rounded-full transition active:scale-[.97] disabled:opacity-40 disabled:active:scale-100";
+  const sizes = { sm: "text-[13px] px-3 py-1.5", md: "text-sm px-4 py-2.5", lg: "text-[15px] px-5 py-3 w-full" };
+  const variants = {
+    primary: "bg-brand text-white shadow-[0_6px_16px_-6px_var(--brand)] hover:bg-brandstrong",
+    soft: "bg-surface2 text-ink hover:brightness-[.98]",
+    outline: "border border-line text-ink hover:bg-surface2",
+    ghost: "text-inksoft hover:text-ink hover:bg-surface2",
+    mint: "text-white shadow-[0_6px_16px_-6px_var(--mint)]",
+  };
+  const style = variant === "mint" ? { background: "var(--mint)" } : undefined;
+  return (
+    <button onClick={onClick} className={`${base} ${sizes[size]} ${variants[variant]} ${className}`} style={style} {...rest}>
+      {children}
+    </button>
+  );
+}
+
+function Chip({ children, tone = "muted", className = "" }) {
+  const tones = {
+    muted: "bg-surface2 text-inksoft",
+    brand: "text-brand",
+    gold:  "text-gold",
+    mint:  "text-mint",
+    crit:  "text-crit",
+  };
+  const bg = { brand: "color-mix(in srgb, var(--brand) 14%, transparent)",
+    gold: "color-mix(in srgb, var(--gold) 16%, transparent)",
+    mint: "color-mix(in srgb, var(--mint) 15%, transparent)",
+    crit: "color-mix(in srgb, var(--crit) 14%, transparent)" }[tone];
+  return (
+    <span className={`inline-flex items-center gap-1 text-[11.5px] font-bold uppercase tracking-wide px-2 py-1 rounded-full ${tones[tone]} ${className}`}
+      style={bg ? { background: bg } : undefined}>
+      {children}
+    </span>
+  );
+}
+
+/* Bottom sheet / modal */
+function Sheet({ open, onClose, title, children, footer }) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
+  }, [open, onClose]);
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center" role="dialog" aria-modal="true">
+      <div className="absolute inset-0 bg-black/45 anim-fade" onClick={onClose} />
+      <div className="relative w-full sm:max-w-[440px] bg-surface sm:rounded-3xl rounded-t-3xl shadow-float anim-sheet max-h-[92vh] flex flex-col">
+        <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-line shrink-0">
+          <h2 className="font-display text-xl font-semibold">{title}</h2>
+          <button onClick={onClose} aria-label="Close" className="p-1.5 -mr-1.5 rounded-full text-inksoft hover:bg-surface2">
+            <Icon d={I.x} size={22} />
+          </button>
+        </div>
+        <div className="overflow-y-auto no-scrollbar px-5 py-4">{children}</div>
+        {footer && <div className="px-5 py-4 border-t border-line shrink-0">{footer}</div>}
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, children, hint }) {
+  return (
+    <label className="block mb-4">
+      <div className="text-[13px] font-semibold text-inksoft mb-1.5">{label}</div>
+      {children}
+      {hint && <div className="text-xs text-muted mt-1">{hint}</div>}
+    </label>
+  );
+}
+const inputCls = "w-full bg-surface2 border border-line rounded-xl px-3.5 py-2.5 text-[15px] text-ink placeholder:text-muted focus:outline-none focus:border-brand transition";
+
+/* ---------- derived selectors ---------- */
+function useUpcoming(state) {
+  return useMemo(() => {
+    const byId = Object.fromEntries([state.me, ...state.people].map(p => [p.id, p]));
+    return state.occasions
+      .map(o => {
+        const date = nextOccurrence(o.month, o.day);
+        return { ...o, date, days: daysUntil(date), person: byId[o.personId] || state.me,
+          years: ordinalYears(o.year, date) };
+      })
+      .filter(o => o.person)
+      .sort((a, b) => a.days - b.days);
+  }, [state]);
+}
+
+/* ---------- app ---------- */
+function App() {
+  const [state, dispatch] = useReducer(reducer, undefined, load);
+  const [tab, setTab] = useState("home");
+  const [openPerson, setOpenPerson] = useState(null); // personId
+  const [toast, setToast] = useState(null);
+  const [modal, setModal] = useState(null); // {kind, ...}
+  const publicView = usePublicProfile();
+
+  useEffect(() => save(state), [state]);
+  useEffect(() => {
+    const root = document.documentElement;
+    if (state.theme === "system") root.removeAttribute("data-theme");
+    else root.setAttribute("data-theme", state.theme);
+  }, [state.theme]);
+
+  const notify = useCallback((msg, opts = {}) => {
+    setToast({ msg, ...opts, id: Math.random() });
+  }, []);
+  useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(null), 2600); return () => clearTimeout(t); }, [toast]);
+
+  const upcoming = useUpcoming(state);
+
+  if (publicView) return <PublicProfile data={publicView} onClose={() => { location.hash = ""; location.reload(); }} />;
+
+  const allPeople = [state.me, ...state.people];
+
+  return (
+    <div className="min-h-[100dvh] sm:py-6 flex justify-center">
+      <div className="relative w-full sm:max-w-[480px] bg-ground sm:bg-surface sm:rounded-[34px] sm:shadow-float sm:border sm:border-line overflow-hidden flex flex-col"
+        style={{ height: "100dvh", maxHeight: "980px" }}>
+
+        <TopBar me={state.me} tab={tab} onProfile={() => setTab("profile")} />
+
+        <main className="flex-1 overflow-y-auto no-scrollbar" style={{ scrollbarWidth: "none" }}>
+          {tab === "home" && (
+            <HomeScreen upcoming={upcoming} state={state} dispatch={dispatch}
+              onOpenPerson={setOpenPerson} onMessage={(o) => setModal({ kind: "message", occasion: o })}
+              notify={notify} />
+          )}
+          {tab === "circle" && (
+            <CircleScreen state={state} upcoming={upcoming}
+              onOpenPerson={setOpenPerson}
+              onAddPerson={() => setModal({ kind: "addPerson" })} />
+          )}
+          {tab === "gifts" && (
+            <GiftsScreen state={state} dispatch={dispatch} onOpenPerson={setOpenPerson}
+              onAddWish={(pid) => setModal({ kind: "addWish", personId: pid })} notify={notify} />
+          )}
+          {tab === "profile" && (
+            <ProfileScreen state={state} dispatch={dispatch} upcoming={upcoming}
+              onAddOccasion={() => setModal({ kind: "addOccasion", personId: ME_ID })}
+              onAddWish={() => setModal({ kind: "addWish", personId: ME_ID })}
+              onShare={() => setModal({ kind: "share" })}
+              onEdit={() => setModal({ kind: "editMe" })}
+              notify={notify} />
+          )}
+        </main>
+
+        <BottomNav tab={tab} setTab={(t) => { setTab(t); }} />
+
+        {/* floating add */}
+        {(tab === "home" || tab === "circle") && (
+          <button onClick={() => setModal({ kind: "addPerson" })}
+            className="absolute right-4 z-30 bg-brand text-white rounded-full w-14 h-14 grid place-items-center shadow-[0_12px_28px_-8px_var(--brand)] active:scale-95 transition"
+            style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 84px)" }} aria-label="Add someone">
+            <Icon d={I.plus} size={26} />
+          </button>
+        )}
+      </div>
+
+      {/* Person detail */}
+      {openPerson && (
+        <PersonDetail state={state} dispatch={dispatch} personId={openPerson}
+          onClose={() => setOpenPerson(null)}
+          onMessage={(o) => setModal({ kind: "message", occasion: o })}
+          onAddOccasion={(pid) => setModal({ kind: "addOccasion", personId: pid })}
+          onAddWish={(pid) => setModal({ kind: "addWish", personId: pid })}
+          notify={notify} />
+      )}
+
+      {/* Modals */}
+      {modal?.kind === "addPerson" && (
+        <AddPersonSheet onClose={() => setModal(null)} onSave={(person, occasion) => {
+          dispatch({ type: "ADD_PERSON", person, occasion }); setModal(null);
+          notify(`${person.name} added to your circle`, { emoji: "🎉" }); fireConfetti(0.7);
+        }} />
+      )}
+      {modal?.kind === "addOccasion" && (
+        <AddOccasionSheet personId={modal.personId} people={allPeople}
+          onClose={() => setModal(null)}
+          onSave={(occasion) => { dispatch({ type: "ADD_OCCASION", occasion }); setModal(null); notify("Occasion saved", { emoji: "📅" }); }} />
+      )}
+      {modal?.kind === "addWish" && (
+        <AddWishSheet personId={modal.personId} people={allPeople}
+          onClose={() => setModal(null)}
+          onSave={(wish) => { dispatch({ type: "ADD_WISH", wish }); setModal(null); notify("Added to wishlist", { emoji: "🎁" }); }} />
+      )}
+      {modal?.kind === "message" && (
+        <MessageSheet occasion={modal.occasion} onClose={() => setModal(null)}
+          onSent={(o) => { dispatch({ type: "MARK_SENT", id: o.id }); notify("Marked as sent — nailed it!", { emoji: "✅" }); fireConfetti(0.6); }}
+          notify={notify} />
+      )}
+      {modal?.kind === "share" && (
+        <ShareSheet state={state} onClose={() => setModal(null)} notify={notify} />
+      )}
+      {modal?.kind === "editMe" && (
+        <EditMeSheet me={state.me} onClose={() => setModal(null)}
+          onSave={(patch) => { dispatch({ type: "UPDATE_ME", patch }); setModal(null); notify("Profile updated"); }} />
+      )}
+
+      {toast && <Toast toast={toast} />}
+    </div>
+  );
+}
+
+/* ---------- top bar & nav ---------- */
+function TopBar({ me, tab, onProfile }) {
+  const titles = { home: null, circle: "My Circle", gifts: "Gifts", profile: null };
+  const greeting = (() => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"; })();
+  return (
+    <header className="shrink-0 px-5 pt-[max(16px,env(safe-area-inset-top))] pb-3 flex items-center justify-between border-b border-line/70 bg-surface/80 backdrop-blur">
+      <div className="flex items-center gap-2.5">
+        <div className="w-9 h-9 rounded-2xl bg-brand text-white grid place-items-center shadow-[0_6px_14px_-6px_var(--brand)]">
+          <Icon d={I.bell} size={19} fill="currentColor" stroke={0} />
+        </div>
+        <div>
+          <div className="font-display text-[20px] leading-none font-semibold tracking-tight">NeverMiss</div>
+          <div className="text-[11px] text-muted mt-0.5">{greeting}, {me.name === "You" ? "friend" : me.name}</div>
+        </div>
+      </div>
+      <button onClick={onProfile} className="rounded-full transition active:scale-95" aria-label="Your profile">
+        <Avatar person={me} size={38} />
+      </button>
+    </header>
+  );
+}
+
+function BottomNav({ tab, setTab }) {
+  const items = [
+    { id: "home", label: "Home", d: I.home },
+    { id: "circle", label: "Circle", d: I.users },
+    { id: "gifts", label: "Gifts", d: I.gift },
+    { id: "profile", label: "You", d: I.user },
+  ];
+  return (
+    <nav className="shrink-0 border-t border-line bg-surface/90 backdrop-blur px-2 pt-1.5"
+      style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}>
+      <div className="flex">
+        {items.map(it => {
+          const active = tab === it.id;
+          return (
+            <button key={it.id} onClick={() => setTab(it.id)}
+              className={`flex-1 flex flex-col items-center gap-0.5 py-1.5 rounded-2xl transition ${active ? "text-brand" : "text-muted hover:text-inksoft"}`}
+              aria-current={active ? "page" : undefined}>
+              <Icon d={it.d} size={23} fill={active ? "currentColor" : "none"} stroke={active ? 0 : 1.9} />
+              <span className={`text-[11px] ${active ? "font-bold" : "font-semibold"}`}>{it.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+
+/* ---------- HOME ---------- */
+function HomeScreen({ upcoming, state, dispatch, onOpenPerson, onMessage, notify }) {
+  const next = upcoming[0];
+  const rest = upcoming.slice(1);
+  const groups = groupByHorizon(rest);
+
+  return (
+    <div className="px-4 pb-28 pt-4 anim-fade">
+      {next ? <HeroCountdown o={next} onOpenPerson={onOpenPerson} onMessage={onMessage} /> :
+        <EmptyHint text="No occasions yet. Add someone in your circle to get started." />}
+
+      {groups.map(g => g.items.length > 0 && (
+        <section key={g.key} className="mt-6">
+          <div className="flex items-baseline justify-between px-1 mb-2">
+            <h3 className="font-display text-[17px] font-semibold">{g.label}</h3>
+            <span className="text-xs text-muted font-semibold">{g.items.length}</span>
+          </div>
+          <div className="space-y-2.5">
+            {g.items.map(o => (
+              <OccasionCard key={o.id} o={o} onOpenPerson={onOpenPerson} onMessage={onMessage}
+                sent={!!state.sent[o.id]} />
+            ))}
+          </div>
+        </section>
+      ))}
+      <div className="text-center text-xs text-muted mt-8 px-6">
+        You're keeping {state.people.length + 1} people close and {state.occasions.length} moments in view. 💛
+      </div>
+    </div>
+  );
+}
+
+function groupByHorizon(list) {
+  const G = { week: [], month: [], later: [] };
+  for (const o of list) {
+    if (o.days <= 7) G.week.push(o);
+    else if (o.days <= 31) G.month.push(o);
+    else G.later.push(o);
+  }
+  return [
+    { key: "week", label: "This week", items: G.week },
+    { key: "month", label: "This month", items: G.month },
+    { key: "later", label: "Coming up", items: G.later },
+  ];
+}
+
+function HeroCountdown({ o, onOpenPerson, onMessage }) {
+  const t = OCCASION_TYPES[o.type];
+  const isSoon = o.days <= 3;
+  const fired = useRef(false);
+  useEffect(() => { if (isSoon && !fired.current) { fired.current = true; const id = setTimeout(() => fireConfetti(1), 350); return () => clearTimeout(id); } }, [isSoon]);
+
+  // progress: how far into the ~365-day cycle (closer = fuller)
+  const pct = Math.max(0.04, 1 - Math.min(o.days, 365) / 365);
+  const R = 52, C = 2 * Math.PI * R;
+
+  return (
+    <div className="relative overflow-hidden rounded-3xl p-5 text-white shadow-card anim-rise"
+      style={{ background: `linear-gradient(135deg, var(--brand), ${o.type === "holiday" || o.type === "wedding" ? "var(--gold)" : "var(--brand-strong)"})` }}>
+      <div className="absolute -top-10 -right-8 w-40 h-40 rounded-full opacity-20" style={{ background: "radial-gradient(circle,#fff,transparent 70%)" }} />
+      <div className="flex items-center gap-1.5 mb-3">
+        <Icon d={I.spark} size={16} />
+        <span className="text-[11.5px] font-bold uppercase tracking-widest opacity-90">Next up</span>
+      </div>
+      <div className="flex items-center gap-4">
+        <div className="relative shrink-0" style={{ width: 124, height: 124 }}>
+          <svg width="124" height="124" viewBox="0 0 124 124" className="rotate-[-90deg]">
+            <circle cx="62" cy="62" r={R} fill="none" stroke="rgba(255,255,255,.25)" strokeWidth="8" />
+            <circle cx="62" cy="62" r={R} fill="none" stroke="#fff" strokeWidth="8" strokeLinecap="round"
+              strokeDasharray={C} strokeDashoffset={C * (1 - pct)} style={{ transition: "stroke-dashoffset 1s ease" }} />
+          </svg>
+          <div className="absolute inset-0 grid place-items-center text-center">
+            <div>
+              <div className="font-display font-semibold leading-none tnum" style={{ fontSize: o.days === 0 ? 26 : 40 }}>
+                {o.days === 0 ? "Today" : o.days}
+              </div>
+              {o.days > 0 && <div className="text-[10.5px] font-bold uppercase tracking-wider opacity-85 mt-1">{o.days === 1 ? "day" : "days"}</div>}
+            </div>
+          </div>
+        </div>
+        <div className="min-w-0">
+          <div className="text-2xl leading-none mb-1">{t.emoji}</div>
+          <h2 className="font-display text-2xl font-semibold leading-tight text-balance">{o.title}</h2>
+          <button onClick={() => onOpenPerson(o.person.id)} className="text-sm opacity-90 mt-1 underline decoration-white/40 underline-offset-2">
+            {o.person.name}{o.years != null && o.type === "birthday" ? ` · turning ${o.years}` : o.years != null && o.type === "anniversary" ? ` · ${ordinal(o.years)}` : ""}
+          </button>
+          <div className="text-[13px] opacity-85 mt-1.5 flex items-center gap-1.5">
+            <Icon d={I.cal} size={14} /> {fmtDate(o.date)} · {relDay(o.days)}
+          </div>
+        </div>
+      </div>
+      <div className="flex gap-2 mt-4">
+        <button onClick={() => onMessage(o)} className="flex-1 bg-white/95 text-brand font-bold text-sm rounded-full py-2.5 active:scale-[.97] transition">
+          Say something
+        </button>
+        <button onClick={() => onOpenPerson(o.person.id)} className="flex-1 bg-white/15 border border-white/30 text-white font-bold text-sm rounded-full py-2.5 active:scale-[.97] transition">
+          Gift ideas
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function OccasionCard({ o, onOpenPerson, onMessage, sent }) {
+  const t = OCCASION_TYPES[o.type];
+  const tone = o.days <= 3 ? "crit" : o.days <= 7 ? "brand" : "muted";
+  return (
+    <div className="bg-surface border border-line rounded-2xl p-3 flex items-center gap-3 shadow-card">
+      <button onClick={() => onOpenPerson(o.person.id)} className="shrink-0"><Avatar person={o.person} size={46} /></button>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
+          <span className="text-[15px]">{t.emoji}</span>
+          <h4 className="font-semibold text-[15px] truncate">{o.title}</h4>
+        </div>
+        <div className="text-[12.5px] text-inksoft mt-0.5 flex items-center gap-2">
+          <span>{fmtDate(o.date)}</span>
+          {o.years != null && o.type === "birthday" && <span className="text-muted">· turns {o.years}</span>}
+          {o.years != null && o.type === "anniversary" && <span className="text-muted">· {ordinal(o.years)}</span>}
+          {sent && <Chip tone="mint"><Icon d={I.check} size={11} stroke={2.6} />Sent</Chip>}
+        </div>
+      </div>
+      <div className="flex flex-col items-end gap-1.5">
+        <Chip tone={tone}>{relDay(o.days)}</Chip>
+        <button onClick={() => onMessage(o)} className="text-brand text-[13px] font-bold px-2 py-1 rounded-full hover:bg-surface2">
+          Say it →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- CIRCLE ---------- */
+function CircleScreen({ state, upcoming, onOpenPerson, onAddPerson }) {
+  const [filter, setFilter] = useState("All");
+  const nextByPerson = useMemo(() => {
+    const m = {};
+    for (const o of upcoming) if (!m[o.person.id]) m[o.person.id] = o;
+    return m;
+  }, [upcoming]);
+  const people = state.people.filter(p => filter === "All" || p.circle === filter);
+
+  return (
+    <div className="px-4 pb-28 pt-4 anim-fade">
+      <div className="flex gap-2 mb-4 overflow-x-auto no-scrollbar -mx-1 px-1">
+        {["All", ...CIRCLES].map(c => {
+          const active = filter === c;
+          const count = c === "All" ? state.people.length : state.people.filter(p => p.circle === c).length;
+          return (
+            <button key={c} onClick={() => setFilter(c)}
+              className={`shrink-0 px-3.5 py-1.5 rounded-full text-[13.5px] font-semibold border transition ${active ? "bg-ink text-ground border-ink" : "bg-surface border-line text-inksoft"}`}>
+              {c} <span className={active ? "opacity-70" : "text-muted"}>{count}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="space-y-2.5">
+        {people.map(p => (
+          <button key={p.id} onClick={() => onOpenPerson(p.id)}
+            className="w-full bg-surface border border-line rounded-2xl p-3 flex items-center gap-3 shadow-card text-left active:scale-[.99] transition">
+            <Avatar person={p} size={48} />
+            <div className="min-w-0 flex-1">
+              <div className="font-semibold text-[15px] truncate">{p.name}</div>
+              <div className="text-[12.5px] text-muted truncate">{p.relationship} · {p.circle}</div>
+            </div>
+            {nextByPerson[p.id] ? (
+              <div className="text-right shrink-0">
+                <div className="text-[12px] text-inksoft">{OCCASION_TYPES[nextByPerson[p.id].type].emoji} {fmtDate(nextByPerson[p.id].date)}</div>
+                <Chip tone={nextByPerson[p.id].days <= 7 ? "brand" : "muted"} className="mt-1">{relDay(nextByPerson[p.id].days)}</Chip>
+              </div>
+            ) : <Icon d={I.chevron} size={18} className="text-muted" />}
+          </button>
+        ))}
+        {people.length === 0 && <EmptyHint text={`No one in ${filter} yet.`} />}
+      </div>
+
+      <button onClick={onAddPerson} className="w-full mt-3 border-2 border-dashed border-line rounded-2xl py-4 text-inksoft font-semibold flex items-center justify-center gap-2 hover:bg-surface2 transition">
+        <Icon d={I.plus} size={18} /> Add someone
+      </button>
+    </div>
+  );
+}
+
+/* ---------- GIFTS ---------- */
+function GiftsScreen({ state, dispatch, onOpenPerson, onAddWish, notify }) {
+  const byId = Object.fromEntries([state.me, ...state.people].map(p => [p.id, p]));
+  const giving = state.wishes.filter(w => w.claimedBy === ME_ID).map(w => ({ ...w, person: byId[w.personId] }));
+  const mine = state.wishes.filter(w => w.personId === ME_ID);
+  const ideasByPerson = useMemo(() => {
+    const groups = {};
+    for (const w of state.wishes) {
+      if (w.personId === ME_ID) continue;
+      (groups[w.personId] = groups[w.personId] || []).push(w);
+    }
+    return groups;
+  }, [state.wishes]);
+
+  return (
+    <div className="px-4 pb-28 pt-4 anim-fade">
+      <h2 className="font-display text-2xl font-semibold px-1 mb-1">Gifts</h2>
+      <p className="text-[13px] text-muted px-1 mb-4">Claim a gift so no one doubles up — the recipient never sees who claimed what.</p>
+
+      {giving.length > 0 && (
+        <section className="mb-6">
+          <SectionLabel icon={I.gift} tone="mint">You're giving ({giving.length})</SectionLabel>
+          <div className="space-y-2.5 mt-2">
+            {giving.map(w => (
+              <div key={w.id} className="rounded-2xl p-3 flex items-center gap-3 border shadow-card"
+                style={{ background: "color-mix(in srgb, var(--mint) 9%, var(--surface))", borderColor: "color-mix(in srgb, var(--mint) 35%, var(--line))" }}>
+                <Avatar person={w.person} size={42} />
+                <div className="min-w-0 flex-1">
+                  <div className="font-semibold text-[14.5px] truncate">{w.title}</div>
+                  <div className="text-[12.5px] text-inksoft">For {w.person.name} · {w.price || "—"}</div>
+                </div>
+                <button onClick={() => { dispatch({ type: "CLAIM", id: w.id, by: null }); notify("Unclaimed"); }}
+                  className="text-[12.5px] font-bold text-inksoft px-2.5 py-1.5 rounded-full hover:bg-surface2">Unclaim</button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className="mb-6">
+        <SectionLabel icon={I.heart} tone="brand">Gift ideas in your circle</SectionLabel>
+        <div className="space-y-4 mt-2">
+          {Object.keys(ideasByPerson).length === 0 && <EmptyHint text="No wishlist items shared yet." />}
+          {Object.entries(ideasByPerson).map(([pid, items]) => (
+            <div key={pid}>
+              <button onClick={() => onOpenPerson(pid)} className="flex items-center gap-2 mb-2 px-1">
+                <Avatar person={byId[pid]} size={28} />
+                <span className="font-semibold text-[14px]">{byId[pid].name}</span>
+                <Icon d={I.chevron} size={15} className="text-muted" />
+              </button>
+              <div className="space-y-2">
+                {items.map(w => <WishRow key={w.id} w={w} state={state} dispatch={dispatch} notify={notify} />)}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <SectionLabel icon={I.spark} tone="gold">What I want</SectionLabel>
+        <div className="space-y-2 mt-2">
+          {mine.map(w => (
+            <div key={w.id} className="bg-surface border border-line rounded-2xl p-3 flex items-center gap-3 shadow-card">
+              <div className="w-10 h-10 rounded-xl grid place-items-center shrink-0" style={{ background: "color-mix(in srgb, var(--gold) 16%, transparent)" }}>
+                <Icon d={I.gift} size={19} className="text-gold" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="font-semibold text-[14.5px] truncate">{w.title}</div>
+                <div className="text-[12.5px] text-muted truncate">{w.price}{w.note ? ` · ${w.note}` : ""}</div>
+              </div>
+              <button onClick={() => { dispatch({ type: "DELETE_WISH", id: w.id }); notify("Removed"); }}
+                className="text-muted p-1.5 rounded-full hover:bg-surface2 hover:text-crit"><Icon d={I.trash} size={17} /></button>
+            </div>
+          ))}
+          <button onClick={() => onAddWish(ME_ID)} className="w-full border-2 border-dashed border-line rounded-2xl py-3 text-inksoft font-semibold flex items-center justify-center gap-2 hover:bg-surface2 transition">
+            <Icon d={I.plus} size={17} /> Add something you'd love
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function WishRow({ w, state, dispatch, notify }) {
+  const claimed = !!w.claimedBy;
+  const mine = w.claimedBy === ME_ID;
+  return (
+    <div className="bg-surface border border-line rounded-2xl p-3 flex items-center gap-3 shadow-card">
+      <div className="w-10 h-10 rounded-xl grid place-items-center shrink-0" style={{ background: "color-mix(in srgb, var(--brand) 12%, transparent)" }}>
+        <Icon d={I.gift} size={19} className="text-brand" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="font-semibold text-[14.5px] truncate">{w.title}</div>
+        <div className="text-[12.5px] text-muted truncate">{w.price}{w.note ? ` · ${w.note}` : ""}</div>
+      </div>
+      {claimed ? (
+        mine ? <Chip tone="mint"><Icon d={I.check} size={11} stroke={2.6} />You've got this</Chip>
+             : <Chip tone="muted">Claimed</Chip>
+      ) : (
+        <Button size="sm" variant="soft" onClick={() => { dispatch({ type: "CLAIM", id: w.id, by: ME_ID }); notify("You're giving this 🎁", { emoji: "🎁" }); fireConfetti(0.5); }}>
+          I'll get it
+        </Button>
+      )}
+    </div>
+  );
+}
+
+/* ---------- PROFILE ---------- */
+function ProfileScreen({ state, dispatch, upcoming, onAddOccasion, onAddWish, onShare, onEdit, notify }) {
+  const myOccasions = upcoming.filter(o => o.person.id === ME_ID);
+  const myWishes = state.wishes.filter(w => w.personId === ME_ID);
+  return (
+    <div className="px-4 pb-28 pt-4 anim-fade">
+      <div className="rounded-3xl p-5 text-center shadow-card border border-line relative overflow-hidden"
+        style={{ background: "linear-gradient(160deg, color-mix(in srgb, var(--brand) 12%, var(--surface)), var(--surface))" }}>
+        <div className="flex justify-center mb-3"><Avatar person={state.me} size={76} /></div>
+        <h2 className="font-display text-2xl font-semibold">{state.me.name === "You" ? "Your profile" : state.me.name}</h2>
+        <p className="text-[13px] text-muted mt-0.5">{state.me.relationship}</p>
+        <div className="flex gap-2 mt-4 justify-center">
+          <Button size="sm" variant="primary" onClick={onShare}><Icon d={I.share} size={15} /> Share profile</Button>
+          <Button size="sm" variant="outline" onClick={onEdit}>Edit</Button>
+        </div>
+      </div>
+
+      <section className="mt-6">
+        <div className="flex items-center justify-between px-1 mb-2">
+          <SectionLabel icon={I.cake} tone="brand">My occasions</SectionLabel>
+          <button onClick={onAddOccasion} className="text-brand text-[13px] font-bold flex items-center gap-1"><Icon d={I.plus} size={15} />Add</button>
+        </div>
+        <div className="space-y-2">
+          {myOccasions.length === 0 && <EmptyHint text="Add your birthday so your circle never forgets." />}
+          {myOccasions.map(o => (
+            <div key={o.id} className="bg-surface border border-line rounded-2xl p-3 flex items-center gap-3 shadow-card">
+              <span className="text-xl">{OCCASION_TYPES[o.type].emoji}</span>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-[14.5px] truncate">{o.title}</div>
+                <div className="text-[12.5px] text-muted">{fmtDate(o.date)} · {relDay(o.days)}</div>
+              </div>
+              <button onClick={() => { dispatch({ type: "DELETE_OCCASION", id: o.id }); notify("Removed"); }}
+                className="text-muted p-1.5 rounded-full hover:bg-surface2 hover:text-crit"><Icon d={I.trash} size={17} /></button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-6">
+        <div className="flex items-center justify-between px-1 mb-2">
+          <SectionLabel icon={I.gift} tone="gold">My wishlist</SectionLabel>
+          <button onClick={onAddWish} className="text-brand text-[13px] font-bold flex items-center gap-1"><Icon d={I.plus} size={15} />Add</button>
+        </div>
+        <p className="text-[12.5px] text-muted px-1 mb-2">People in your circle can quietly claim these for your occasions.</p>
+        <div className="space-y-2">
+          {myWishes.map(w => (
+            <div key={w.id} className="bg-surface border border-line rounded-2xl p-3 flex items-center gap-3 shadow-card">
+              <div className="w-9 h-9 rounded-xl grid place-items-center shrink-0" style={{ background: "color-mix(in srgb, var(--gold) 16%, transparent)" }}>
+                <Icon d={I.gift} size={17} className="text-gold" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="font-semibold text-[14px] truncate">{w.title}</div>
+                <div className="text-[12px] text-muted truncate">{w.price}{w.note ? ` · ${w.note}` : ""}</div>
+              </div>
+              <button onClick={() => { dispatch({ type: "DELETE_WISH", id: w.id }); notify("Removed"); }}
+                className="text-muted p-1.5 rounded-full hover:bg-surface2 hover:text-crit"><Icon d={I.trash} size={16} /></button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="mt-8 flex items-center justify-center gap-4 text-[12.5px] text-muted">
+        <ThemeToggle theme={state.theme} setTheme={(t) => dispatch({ type: "SET_THEME", theme: t })} />
+        <span className="opacity-40">·</span>
+        <button onClick={() => { if (confirm("Reset all NeverMiss data on this device back to the demo?")) { dispatch({ type: "RESET" }); notify("Reset to demo"); } }}
+          className="hover:text-crit font-semibold">Reset demo</button>
+      </div>
+      <p className="text-center text-[11px] text-muted/80 mt-3 px-8 leading-relaxed">
+        This prototype saves to this browser only. A shipping version would sync your circle across phones.
+      </p>
+    </div>
+  );
+}
+
+function ThemeToggle({ theme, setTheme }) {
+  const order = ["system", "light", "dark"];
+  const labels = { system: "Auto theme", light: "Light", dark: "Dark" };
+  const next = order[(order.indexOf(theme) + 1) % order.length];
+  return <button onClick={() => setTheme(next)} className="font-semibold hover:text-ink">{labels[theme]}</button>;
+}
+
+/* ---------- PERSON DETAIL ---------- */
+function PersonDetail({ state, dispatch, personId, onClose, onMessage, onAddOccasion, onAddWish, notify }) {
+  const person = [state.me, ...state.people].find(p => p.id === personId);
+  const isMe = personId === ME_ID;
+  const occasions = useMemo(() => state.occasions
+    .filter(o => o.personId === personId)
+    .map(o => { const date = nextOccurrence(o.month, o.day); return { ...o, date, days: daysUntil(date), years: ordinalYears(o.year, date) }; })
+    .sort((a, b) => a.days - b.days), [state.occasions, personId]);
+  const wishes = state.wishes.filter(w => w.personId === personId);
+  if (!person) return null;
+
+  return (
+    <div className="fixed inset-0 z-[70] flex justify-center anim-fade">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative w-full sm:max-w-[480px] bg-ground sm:my-6 sm:rounded-[34px] overflow-hidden flex flex-col anim-sheet"
+        style={{ height: "100dvh", maxHeight: "980px" }}>
+        {/* header */}
+        <div className="relative px-5 pt-[max(16px,env(safe-area-inset-top))] pb-5 text-white shrink-0"
+          style={{ background: `linear-gradient(150deg, ${person.color}, color-mix(in srgb, ${person.color} 60%, #000))` }}>
+          <button onClick={onClose} className="absolute top-[max(16px,env(safe-area-inset-top))] left-4 bg-white/20 rounded-full p-1.5 active:scale-95" aria-label="Back">
+            <Icon d={I.chevronL} size={22} />
+          </button>
+          <div className="flex flex-col items-center text-center pt-6">
+            <div className="rounded-full grid place-items-center border-2 border-white/70 mb-2" style={{ width: 78, height: 78, background: "rgba(255,255,255,.18)" }}>
+              <span style={{ fontSize: 38 }}>{person.emoji}</span>
+            </div>
+            <h2 className="font-display text-2xl font-semibold">{person.name}</h2>
+            <p className="text-[13px] opacity-90">{person.relationship} · {person.circle}</p>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-5">
+          {/* occasions */}
+          <div className="flex items-center justify-between px-1 mb-2">
+            <SectionLabel icon={I.cake} tone="brand">Occasions</SectionLabel>
+            <button onClick={() => onAddOccasion(personId)} className="text-brand text-[13px] font-bold flex items-center gap-1"><Icon d={I.plus} size={15} />Add</button>
+          </div>
+          <div className="space-y-2 mb-6">
+            {occasions.length === 0 && <EmptyHint text="No occasions yet." />}
+            {occasions.map(o => (
+              <div key={o.id} className="bg-surface border border-line rounded-2xl p-3 flex items-center gap-3 shadow-card">
+                <span className="text-xl">{OCCASION_TYPES[o.type].emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-[14.5px] truncate">{o.title}</div>
+                  <div className="text-[12.5px] text-muted">
+                    {fmtDate(o.date)}
+                    {o.years != null && o.type === "birthday" && ` · turning ${o.years}`}
+                    {o.years != null && o.type === "anniversary" && ` · ${ordinal(o.years)}`}
+                  </div>
+                </div>
+                <Chip tone={o.days <= 7 ? "brand" : "muted"}>{relDay(o.days)}</Chip>
+                {!isMe && (
+                  <button onClick={() => onMessage(o)} className="text-brand text-[13px] font-bold px-2 py-1 rounded-full hover:bg-surface2">Say it</button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* wishlist */}
+          <div className="flex items-center justify-between px-1 mb-2">
+            <SectionLabel icon={I.gift} tone="gold">{isMe ? "My wishlist" : "Wishlist"}</SectionLabel>
+            <button onClick={() => onAddWish(personId)} className="text-brand text-[13px] font-bold flex items-center gap-1"><Icon d={I.plus} size={15} />Add</button>
+          </div>
+          {!isMe && <p className="text-[12px] text-muted px-1 mb-2">Claim one so no one doubles up — {person.name} won't see it.</p>}
+          <div className="space-y-2">
+            {wishes.length === 0 && <EmptyHint text="No wishlist items yet." />}
+            {wishes.map(w => isMe
+              ? (
+                <div key={w.id} className="bg-surface border border-line rounded-2xl p-3 flex items-center gap-3 shadow-card">
+                  <div className="w-9 h-9 rounded-xl grid place-items-center shrink-0" style={{ background: "color-mix(in srgb, var(--gold) 16%, transparent)" }}>
+                    <Icon d={I.gift} size={17} className="text-gold" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-[14px] truncate">{w.title}</div>
+                    <div className="text-[12px] text-muted truncate">{w.price}{w.note ? ` · ${w.note}` : ""}</div>
+                  </div>
+                  <button onClick={() => { dispatch({ type: "DELETE_WISH", id: w.id }); notify("Removed"); }} className="text-muted p-1.5 rounded-full hover:bg-surface2 hover:text-crit"><Icon d={I.trash} size={16} /></button>
+                </div>
+              )
+              : <WishRow key={w.id} w={w} state={state} dispatch={dispatch} notify={notify} />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- shared bits ---------- */
+function SectionLabel({ icon, tone = "brand", children }) {
+  const color = { brand: "text-brand", gold: "text-gold", mint: "text-mint" }[tone];
+  return (
+    <h3 className="flex items-center gap-1.5 font-display text-[17px] font-semibold">
+      <Icon d={icon} size={17} className={color} /> {children}
+    </h3>
+  );
+}
+function EmptyHint({ text }) {
+  return <div className="text-center text-[13px] text-muted bg-surface2 rounded-2xl py-6 px-4">{text}</div>;
+}
+function Toast({ toast }) {
+  return (
+    <div className="fixed left-1/2 -translate-x-1/2 z-[95] anim-pop" style={{ bottom: "calc(env(safe-area-inset-bottom,0px) + 96px)" }}>
+      <div className="bg-ink text-ground rounded-full px-4 py-2.5 shadow-float text-[13.5px] font-semibold flex items-center gap-2 max-w-[90vw]">
+        {toast.emoji && <span>{toast.emoji}</span>} {toast.msg}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- sheets: add person ---------- */
+function EmojiPicker({ value, onChange, colors, color, onColor }) {
+  return (
+    <div>
+      <div className="grid grid-cols-10 gap-1.5 mb-3">
+        {AVATAR_EMOJIS.map(e => (
+          <button key={e} type="button" onClick={() => onChange(e)}
+            className={`aspect-square rounded-xl text-lg grid place-items-center transition ${value === e ? "ring-2 ring-brand bg-surface2" : "bg-surface2/60 hover:bg-surface2"}`}>{e}</button>
+        ))}
+      </div>
+      {colors && (
+        <div className="flex gap-2 flex-wrap">
+          {colors.map(c => (
+            <button key={c} type="button" onClick={() => onColor(c)} aria-label="color"
+              className={`w-7 h-7 rounded-full transition ${color === c ? "ring-2 ring-offset-2 ring-ink" : ""}`}
+              style={{ background: c, "--tw-ring-offset-color": "var(--surface)" }} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AddPersonSheet({ onClose, onSave }) {
+  const [name, setName] = useState("");
+  const [relationship, setRel] = useState("");
+  const [circle, setCircle] = useState("Family");
+  const [emoji, setEmoji] = useState("🦊");
+  const [color, setColor] = useState(AVATAR_COLORS[2]);
+  // quick first occasion
+  const [addOcc, setAddOcc] = useState(true);
+  const [occType, setOccType] = useState("birthday");
+  const [month, setMonth] = useState("");
+  const [day, setDay] = useState("");
+  const [year, setYear] = useState("");
+
+  const valid = name.trim().length > 0 && (!addOcc || (month && day));
+  function submit() {
+    if (!valid) return;
+    const id = "p_" + Math.random().toString(36).slice(2, 8);
+    const person = { id, name: name.trim(), relationship: relationship.trim() || "Someone special", circle, emoji, color };
+    let occasion = null;
+    if (addOcc && month && day) {
+      occasion = { id: "o_" + Math.random().toString(36).slice(2, 8), personId: id, type: occType,
+        title: `${name.trim()}'s ${OCCASION_TYPES[occType].label}`, month: +month, day: +day, year: year ? +year : null };
+    }
+    onSave(person, occasion);
+  }
+
+  return (
+    <Sheet open onClose={onClose} title="Add to your circle"
+      footer={<Button variant="primary" size="lg" onClick={submit} disabled={!valid}>Add {name.trim() || "person"}</Button>}>
+      <div className="flex items-center gap-3 mb-4">
+        <div className="rounded-full grid place-items-center border shrink-0" style={{ width: 56, height: 56, background: `color-mix(in srgb, ${color} 20%, var(--surface))`, borderColor: `color-mix(in srgb, ${color} 45%, transparent)` }}>
+          <span style={{ fontSize: 28 }}>{emoji}</span>
+        </div>
+        <div className="flex-1">
+          <input autoFocus value={name} onChange={e => setName(e.target.value)} placeholder="Name" className={inputCls} />
+        </div>
+      </div>
+      <Field label="Relationship">
+        <input value={relationship} onChange={e => setRel(e.target.value)} placeholder="Mom, best friend, coworker…" className={inputCls} />
+      </Field>
+      <Field label="Circle">
+        <div className="flex gap-2">
+          {CIRCLES.map(c => (
+            <button key={c} type="button" onClick={() => setCircle(c)}
+              className={`flex-1 py-2 rounded-xl text-sm font-semibold border transition ${circle === c ? "bg-ink text-ground border-ink" : "bg-surface2 border-line text-inksoft"}`}>{c}</button>
+          ))}
+        </div>
+      </Field>
+      <Field label="Avatar">
+        <EmojiPicker value={emoji} onChange={setEmoji} colors={AVATAR_COLORS} color={color} onColor={setColor} />
+      </Field>
+
+      <div className="border-t border-line pt-4 mt-2">
+        <label className="flex items-center justify-between mb-1">
+          <span className="text-[14px] font-semibold">Add an occasion now</span>
+          <button type="button" onClick={() => setAddOcc(v => !v)}
+            className={`w-11 h-6 rounded-full transition relative ${addOcc ? "bg-brand" : "bg-line"}`}>
+            <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${addOcc ? "left-[22px]" : "left-0.5"}`} />
+          </button>
+        </label>
+        {addOcc && (
+          <div className="mt-3 anim-fade">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar mb-3 -mx-1 px-1">
+              {Object.entries(OCCASION_TYPES).map(([k, v]) => (
+                <button key={k} type="button" onClick={() => setOccType(k)}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-[13px] font-semibold border transition ${occType === k ? "bg-brand text-white border-brand" : "bg-surface2 border-line text-inksoft"}`}>
+                  {v.emoji} {v.label}
+                </button>
+              ))}
+            </div>
+            <DatePicker month={month} day={day} year={year} setMonth={setMonth} setDay={setDay} setYear={setYear} />
+          </div>
+        )}
+      </div>
+    </Sheet>
+  );
+}
+
+function DatePicker({ month, day, year, setMonth, setDay, setYear, yearLabel = "Year (optional)" }) {
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      <div>
+        <div className="text-[12px] font-semibold text-inksoft mb-1">Month</div>
+        <select value={month} onChange={e => setMonth(e.target.value)} className={inputCls}>
+          <option value="">—</option>
+          {MONTHS_FULL.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
+        </select>
+      </div>
+      <div>
+        <div className="text-[12px] font-semibold text-inksoft mb-1">Day</div>
+        <select value={day} onChange={e => setDay(e.target.value)} className={inputCls}>
+          <option value="">—</option>
+          {Array.from({ length: 31 }, (_, i) => <option key={i} value={i + 1}>{i + 1}</option>)}
+        </select>
+      </div>
+      <div>
+        <div className="text-[12px] font-semibold text-inksoft mb-1">Year</div>
+        <input value={year} onChange={e => setYear(e.target.value.replace(/\D/g, "").slice(0, 4))} placeholder="—" inputMode="numeric" className={inputCls} />
+      </div>
+    </div>
+  );
+}
+
+function AddOccasionSheet({ personId, people, onClose, onSave }) {
+  const person = people.find(p => p.id === personId);
+  const [type, setType] = useState("birthday");
+  const [title, setTitle] = useState("");
+  const [month, setMonth] = useState("");
+  const [day, setDay] = useState("");
+  const [year, setYear] = useState("");
+  const valid = month && day;
+  function submit() {
+    if (!valid) return;
+    const t = OCCASION_TYPES[type];
+    onSave({ id: "o_" + Math.random().toString(36).slice(2, 8), personId, type,
+      title: title.trim() || `${person.name === "You" ? "My" : person.name + "'s"} ${t.label}`,
+      month: +month, day: +day, year: year ? +year : null });
+  }
+  return (
+    <Sheet open onClose={onClose} title={`Add occasion${person ? " · " + person.name : ""}`}
+      footer={<Button variant="primary" size="lg" onClick={submit} disabled={!valid}>Save occasion</Button>}>
+      <Field label="Type">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1">
+          {Object.entries(OCCASION_TYPES).map(([k, v]) => (
+            <button key={k} type="button" onClick={() => setType(k)}
+              className={`shrink-0 px-3 py-1.5 rounded-full text-[13px] font-semibold border transition ${type === k ? "bg-brand text-white border-brand" : "bg-surface2 border-line text-inksoft"}`}>
+              {v.emoji} {v.label}
+            </button>
+          ))}
+        </div>
+      </Field>
+      <Field label="Title" hint="Leave blank to auto-name it.">
+        <input value={title} onChange={e => setTitle(e.target.value)} placeholder={`${person?.name === "You" ? "My" : (person?.name || "") + "'s"} ${OCCASION_TYPES[type].label}`} className={inputCls} />
+      </Field>
+      <Field label="Date">
+        <DatePicker month={month} day={day} year={year} setMonth={setMonth} setDay={setDay} setYear={setYear} />
+      </Field>
+    </Sheet>
+  );
+}
+
+function AddWishSheet({ personId, people, onClose, onSave }) {
+  const person = people.find(p => p.id === personId);
+  const [title, setTitle] = useState("");
+  const [price, setPrice] = useState("");
+  const [url, setUrl] = useState("");
+  const [note, setNote] = useState("");
+  const valid = title.trim().length > 0;
+  return (
+    <Sheet open onClose={onClose} title={`Add gift idea${person && person.id !== ME_ID ? " · " + person.name : ""}`}
+      footer={<Button variant="primary" size="lg" disabled={!valid}
+        onClick={() => onSave({ id: "w_" + Math.random().toString(36).slice(2, 8), personId, title: title.trim(), price: price.trim(), url: url.trim(), note: note.trim(), claimedBy: null })}>
+        Add to wishlist</Button>}>
+      <Field label="What is it?"><input autoFocus value={title} onChange={e => setTitle(e.target.value)} placeholder="Cozy weighted blanket" className={inputCls} /></Field>
+      <Field label="Rough price"><input value={price} onChange={e => setPrice(e.target.value)} placeholder="$60" className={inputCls} /></Field>
+      <Field label="Link (optional)"><input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://…" className={inputCls} /></Field>
+      <Field label="Note (optional)"><input value={note} onChange={e => setNote(e.target.value)} placeholder="Sage green if possible" className={inputCls} /></Field>
+    </Sheet>
+  );
+}
+
+function EditMeSheet({ me, onClose, onSave }) {
+  const [name, setName] = useState(me.name === "You" ? "" : me.name);
+  const [relationship, setRel] = useState(me.relationship === "That's me" ? "" : me.relationship);
+  const [emoji, setEmoji] = useState(me.emoji);
+  const [color, setColor] = useState(me.color);
+  return (
+    <Sheet open onClose={onClose} title="Edit your profile"
+      footer={<Button variant="primary" size="lg" onClick={() => onSave({ name: name.trim() || "You", relationship: relationship.trim() || "That's me", emoji, color })}>Save</Button>}>
+      <Field label="Your name"><input autoFocus value={name} onChange={e => setName(e.target.value)} placeholder="Your name" className={inputCls} /></Field>
+      <Field label="Tagline"><input value={relationship} onChange={e => setRel(e.target.value)} placeholder="e.g. Gift enthusiast" className={inputCls} /></Field>
+      <Field label="Avatar"><EmojiPicker value={emoji} onChange={setEmoji} colors={AVATAR_COLORS} color={color} onColor={setColor} /></Field>
+    </Sheet>
+  );
+}
+
+/* ---------- message drafts ---------- */
+function MessageSheet({ occasion, onClose, onSent, notify }) {
+  const person = occasion.person;
+  const templates = MESSAGE_TEMPLATES[occasion.type] || MESSAGE_TEMPLATES.custom;
+  const [text, setText] = useState(templates[0].replace(/\{name\}/g, person.name));
+  const [idx, setIdx] = useState(0);
+
+  function pick(i) { setIdx(i); setText(templates[i].replace(/\{name\}/g, person.name)); }
+  async function copy() {
+    try { await navigator.clipboard.writeText(text); notify("Copied to clipboard", { emoji: "📋" }); }
+    catch (e) { notify("Select and copy the message"); }
+  }
+  return (
+    <Sheet open onClose={onClose} title={`Say happy ${OCCASION_TYPES[occasion.type].label.toLowerCase()}`}
+      footer={
+        <div className="flex gap-2">
+          <Button variant="soft" onClick={copy} className="flex-1"><Icon d={I.copy} size={16} /> Copy</Button>
+          <Button variant="primary" onClick={() => { onSent(occasion); onClose(); }} className="flex-1"><Icon d={I.check} size={16} /> Mark sent</Button>
+        </div>
+      }>
+      <div className="flex items-center gap-3 mb-4">
+        <Avatar person={person} size={44} />
+        <div>
+          <div className="font-semibold">{person.name}</div>
+          <div className="text-[12.5px] text-muted">{OCCASION_TYPES[occasion.type].emoji} {occasion.title} · {relDay(occasion.days)}</div>
+        </div>
+      </div>
+      <div className="text-[12px] font-bold uppercase tracking-wide text-muted mb-2">Suggestions</div>
+      <div className="space-y-2 mb-4">
+        {templates.map((t, i) => (
+          <button key={i} onClick={() => pick(i)}
+            className={`w-full text-left text-[13.5px] leading-snug p-3 rounded-xl border transition ${idx === i ? "border-brand bg-surface2" : "border-line hover:bg-surface2"}`}>
+            {t.replace(/\{name\}/g, person.name)}
+          </button>
+        ))}
+      </div>
+      <Field label="Your message">
+        <textarea value={text} onChange={e => setText(e.target.value)} rows={3} className={inputCls + " resize-none"} />
+      </Field>
+    </Sheet>
+  );
+}
+
+/* ---------- share ---------- */
+function encodeProfile(state) {
+  const payload = {
+    n: state.me.name, r: state.me.relationship, e: state.me.emoji, c: state.me.color,
+    o: state.occasions.filter(o => o.personId === ME_ID).map(o => ({ t: o.title, ty: o.type, m: o.month, d: o.day, y: o.year })),
+    w: state.wishes.filter(w => w.personId === ME_ID).map(w => ({ t: w.title, p: w.price, no: w.note })),
+  };
+  try { return btoa(unescape(encodeURIComponent(JSON.stringify(payload)))); } catch (e) { return ""; }
+}
+function decodeProfile(str) {
+  try { return JSON.parse(decodeURIComponent(escape(atob(str)))); } catch (e) { return null; }
+}
+function usePublicProfile() {
+  const [data] = useState(() => {
+    const h = location.hash || "";
+    if (h.startsWith("#p/")) return decodeProfile(h.slice(3));
+    return null;
+  });
+  return data;
+}
+
+function ShareSheet({ state, onClose, notify }) {
+  const link = useMemo(() => location.href.split("#")[0] + "#p/" + encodeProfile(state), [state]);
+  async function copy() {
+    try { await navigator.clipboard.writeText(link); notify("Link copied", { emoji: "🔗" }); }
+    catch (e) { notify("Copy the link below"); }
+  }
+  async function share() {
+    if (navigator.share) { try { await navigator.share({ title: "My NeverMiss profile", url: link }); } catch (e) {} }
+    else copy();
+  }
+  return (
+    <Sheet open onClose={onClose} title="Share your profile"
+      footer={<Button variant="primary" size="lg" onClick={share}><Icon d={I.share} size={16} /> Share link</Button>}>
+      <div className="text-center py-2">
+        <div className="mx-auto w-16 h-16 rounded-2xl bg-brand text-white grid place-items-center mb-3 shadow-[0_10px_24px_-8px_var(--brand)]">
+          <Icon d={I.link} size={28} />
+        </div>
+        <p className="text-[14px] text-inksoft leading-relaxed px-2">
+          Send this to family and friends. They'll see your occasions and wishlist and can quietly claim gifts — so nobody forgets, and nobody doubles up.
+        </p>
+      </div>
+      <div className="mt-4 bg-surface2 border border-line rounded-xl p-3 flex items-center gap-2">
+        <div className="text-[12.5px] text-inksoft truncate flex-1 tnum">{link.replace(/^https?:\/\//, "")}</div>
+        <button onClick={copy} className="shrink-0 text-brand font-bold text-[13px] flex items-center gap-1"><Icon d={I.copy} size={15} />Copy</button>
+      </div>
+      <p className="text-[11.5px] text-muted mt-3 text-center px-4">In this prototype the link carries a read-only snapshot of your profile. A shipping version would use secure private links.</p>
+    </Sheet>
+  );
+}
+
+/* ---------- public (shared) profile view ---------- */
+function PublicProfile({ data, onClose }) {
+  const person = { name: data.n || "Someone", relationship: data.r || "", emoji: data.e || "🎈", color: data.c || "#E23E6B", id: "shared" };
+  const occasions = (data.o || []).map(o => {
+    const date = nextOccurrence(o.m, o.d);
+    return { title: o.t, type: o.ty, date, days: daysUntil(date), years: ordinalYears(o.y, date) };
+  }).sort((a, b) => a.days - b.days);
+  const wishes = data.w || [];
+  const [claimed, setClaimed] = useState({});
+
+  return (
+    <div className="min-h-[100dvh] flex justify-center sm:py-6">
+      <div className="w-full sm:max-w-[480px] bg-surface sm:rounded-[34px] sm:shadow-float overflow-hidden flex flex-col" style={{ minHeight: "100dvh" }}>
+        <div className="px-5 pt-[max(20px,env(safe-area-inset-top))] pb-6 text-white text-center"
+          style={{ background: `linear-gradient(150deg, ${person.color}, color-mix(in srgb, ${person.color} 55%, #000))` }}>
+          <div className="text-[11px] font-bold uppercase tracking-widest opacity-80 mb-3">Shared via NeverMiss</div>
+          <div className="mx-auto rounded-full grid place-items-center border-2 border-white/70 mb-3" style={{ width: 84, height: 84, background: "rgba(255,255,255,.18)" }}>
+            <span style={{ fontSize: 40 }}>{person.emoji}</span>
+          </div>
+          <h1 className="font-display text-3xl font-semibold">{person.name}</h1>
+          {person.relationship && <p className="opacity-90 text-sm mt-1">{person.relationship}</p>}
+        </div>
+        <div className="flex-1 px-4 py-5">
+          <SectionLabel icon={I.cake} tone="brand">Occasions</SectionLabel>
+          <div className="space-y-2 mt-2 mb-6">
+            {occasions.length === 0 && <EmptyHint text="No occasions shared." />}
+            {occasions.map((o, i) => (
+              <div key={i} className="bg-surface border border-line rounded-2xl p-3 flex items-center gap-3 shadow-card">
+                <span className="text-xl">{(OCCASION_TYPES[o.type] || OCCASION_TYPES.custom).emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-[14.5px] truncate">{o.title}</div>
+                  <div className="text-[12.5px] text-muted">{fmtDate(o.date)}{o.years != null && o.type === "birthday" ? ` · turning ${o.years}` : ""}</div>
+                </div>
+                <Chip tone={o.days <= 7 ? "brand" : "muted"}>{relDay(o.days)}</Chip>
+              </div>
+            ))}
+          </div>
+
+          <SectionLabel icon={I.gift} tone="gold">Wishlist</SectionLabel>
+          <p className="text-[12px] text-muted px-1 mt-1 mb-2">Claim one so no one else does — {person.name} won't see who.</p>
+          <div className="space-y-2">
+            {wishes.length === 0 && <EmptyHint text="No wishlist shared." />}
+            {wishes.map((w, i) => (
+              <div key={i} className="bg-surface border border-line rounded-2xl p-3 flex items-center gap-3 shadow-card">
+                <div className="w-10 h-10 rounded-xl grid place-items-center shrink-0" style={{ background: "color-mix(in srgb, var(--brand) 12%, transparent)" }}>
+                  <Icon d={I.gift} size={19} className="text-brand" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-semibold text-[14.5px] truncate">{w.t}</div>
+                  <div className="text-[12.5px] text-muted truncate">{w.p}{w.no ? ` · ${w.no}` : ""}</div>
+                </div>
+                {claimed[i]
+                  ? <Chip tone="mint"><Icon d={I.check} size={11} stroke={2.6} />You've got this</Chip>
+                  : <Button size="sm" variant="soft" onClick={() => { setClaimed(c => ({ ...c, [i]: true })); fireConfetti(0.5); }}>I'll get it</Button>}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 rounded-2xl border border-line p-4 text-center bg-surface2">
+            <div className="font-display text-lg font-semibold mb-1">Never miss their day</div>
+            <p className="text-[13px] text-muted mb-3">Get reminders for {person.name} and everyone you love.</p>
+            <Button variant="primary" onClick={onClose}>Open my NeverMiss</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- mount ---------- */
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
