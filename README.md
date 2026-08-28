@@ -21,7 +21,13 @@ buys the same gift twice.
 - **Shareable profile** — a link that shows your occasions and wishlist to the
   people you send it to.
 
-## Run it
+## Install it on your phone
+
+NeverMiss is an installable web app (PWA). Deploy the folder to any static host
+and add it to your home screen — you get an app icon, fullscreen, and offline
+support. Step-by-step (no code needed): see **[DEPLOY.md](DEPLOY.md)**.
+
+## Run it locally
 
 It's a single self-contained file — no build step, no install.
 
